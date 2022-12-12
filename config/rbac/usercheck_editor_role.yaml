@@ -1,0 +1,24 @@
+# permissions for end users to edit userchecks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: usercheck-editor-role
+rules:
+- apiGroups:
+  - userapp.hjjzs.xyz
+  resources:
+  - userchecks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - userapp.hjjzs.xyz
+  resources:
+  - userchecks/status
+  verbs:
+  - get

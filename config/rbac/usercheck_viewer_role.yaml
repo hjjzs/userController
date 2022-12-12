@@ -1,0 +1,20 @@
+# permissions for end users to view userchecks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: usercheck-viewer-role
+rules:
+- apiGroups:
+  - userapp.hjjzs.xyz
+  resources:
+  - userchecks
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - userapp.hjjzs.xyz
+  resources:
+  - userchecks/status
+  verbs:
+  - get

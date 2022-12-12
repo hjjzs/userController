@@ -1,0 +1,25 @@
+domain: hjjzs.xyz
+layout:
+- go.kubebuilder.io/v3
+projectName: usercontroller
+repo: hjjzs.xyz
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: hjjzs.xyz
+  group: userapp
+  kind: User
+  path: hjjzs.xyz/api/v1
+  version: v1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: hjjzs.xyz
+  group: userapp
+  kind: UserCheck
+  path: hjjzs.xyz/api/v1
+  version: v1
+version: "3"

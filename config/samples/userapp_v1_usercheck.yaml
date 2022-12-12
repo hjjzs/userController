@@ -1,0 +1,6 @@
+apiVersion: userapp.hjjzs.xyz/v1
+kind: UserCheck
+metadata:
+  name: usercheck-sample
+spec:
+  # TODO(user): Add fields here
