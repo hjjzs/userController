@@ -28,18 +28,38 @@ type UserSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of User. Edit user_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// UserNmae
+	//+kubebuilder:validation:Required
+	UserName string `json:"username"`
+
+	// password
+	//+kubebuilder:validation:Required
+	//kubebuilder:validation:MinLength:=8
+	Password string `json:"password"`
+
+	//NewPassword 
+	//+kubebuilder:validation:Optional
+	//kubebuilder:validation:MinLength:=8
+	Newpassword string `json:"newpassword"`
+
+	// role
+	//+kubebuilder:validation:Required
+	Role     string `json:"role"`
 }
 
 // UserStatus defines the observed state of User
 type UserStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	Status  string `json:"status"`
+	Message string `json:"message"`
+	Secret  string `json:"secret"`
 }
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:JSONPath=".status.status",type=string,description="user status",name="STATUS"
+//+kubebuilder:resource:path=users,scope=Namespaced,shortName="us",singular=user
 
 // User is the Schema for the users API
 type User struct {
