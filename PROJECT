@@ -1,0 +1,16 @@
+domain: hjjzs.xyz
+layout:
+- go.kubebuilder.io/v3
+projectName: usercontroller2
+repo: user.hjjzs.xyz
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: hjjzs.xyz
+  group: userapp
+  kind: User
+  path: user.hjjzs.xyz/api/v1
+  version: v1
+version: "3"
