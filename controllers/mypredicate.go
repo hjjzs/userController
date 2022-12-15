@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	userappv1 "hjjzs.xyz/api/v1"
+	userappv1 "user.hjjzs.xyz/api/v1"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 )

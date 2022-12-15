@@ -29,8 +29,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	userappv1 "hjjzs.xyz/api/v1"
-	util "hjjzs.xyz/utils"
+	userappv1 "user.hjjzs.xyz/api/v1"
+	util "user.hjjzs.xyz/utils"
 )
 
 // UserReconciler reconciles a User object

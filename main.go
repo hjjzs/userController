@@ -31,8 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	userappv1 "hjjzs.xyz/api/v1"
-	"hjjzs.xyz/controllers"
+	userappv1 "user.hjjzs.xyz/api/v1"
+	"user.hjjzs.xyz/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
