@@ -4,3 +4,6 @@ metadata:
   name: user-sample
 spec:
   # TODO(user): Add fields here
+  username: hjj
+  password: "123456"
+  role: admin
