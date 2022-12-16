@@ -42,9 +42,6 @@ spec:
           spec:
             description: UserSpec defines the desired state of User
             properties:
-              newpassword:
-                description: NewPassword
-                type: string
               password:
                 description: password
                 type: string

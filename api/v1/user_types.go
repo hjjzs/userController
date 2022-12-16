@@ -37,11 +37,6 @@ type UserSpec struct {
 	//kubebuilder:validation:MinLength:=8
 	Password string `json:"password"`
 
-	//NewPassword 
-	//+kubebuilder:validation:Optional
-	//kubebuilder:validation:MinLength:=8
-	Newpassword string `json:"newpassword"`
-
 	// role
 	//+kubebuilder:validation:Required
 	Role     string `json:"role"`
