@@ -39,6 +39,7 @@ type UserSpec struct {
 
 	// role
 	//+kubebuilder:validation:Required
+	//+kubebuilder:validation:Enum=admin;user
 	Role     string `json:"role"`
 }
 

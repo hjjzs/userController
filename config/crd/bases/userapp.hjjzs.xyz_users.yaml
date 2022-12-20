@@ -47,6 +47,9 @@ spec:
                 type: string
               role:
                 description: role
+                enum:
+                - admin
+                - user
                 type: string
               username:
                 description: UserNmae

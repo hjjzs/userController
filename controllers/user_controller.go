@@ -19,8 +19,11 @@ package controllers
 import (
 	"context"
 	"regexp"
+	"time"
 
 	v1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -38,10 +41,17 @@ type UserReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+var (
+	rolename      string
+	Domain        = "-demo"
+	userNamespace string
+)
+
 //+kubebuilder:rbac:groups=userapp.hjjzs.xyz,resources=users,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=userapp.hjjzs.xyz,resources=users/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=userapp.hjjzs.xyz,resources=users/finalizers,verbs=update
 //+kubebuilder:rbac:groups=core,resources=secrets,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=core,resources=serviceaccounts,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -65,36 +75,75 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 	if user.Status.Status == "" {
 		// 创建ns, 如果ns不存在
 		ns := v1.Namespace{}
-		domain := "-demo"
-		err2 := r.Get(ctx, types.NamespacedName{Name: user.Spec.UserName + domain}, &ns)
+		userNamespace = user.Spec.UserName + Domain
+		err2 := r.Get(ctx, types.NamespacedName{Name: userNamespace}, &ns)
 		if err2 == nil {
-			logger.Info("namespece: " + user.Spec.UserName + domain + "已经存在")
+			logger.Info("namespece: " + userNamespace + "已经存在")
 		} else {
-			ns.ObjectMeta.Name = user.Spec.UserName + domain
+			ns.ObjectMeta.Name = userNamespace
 			err3 := r.Create(ctx, &ns)
 			if err3 != nil {
 				logger.Error(err3, "创建ns失败")
 			}
 		}
 
+		time.Sleep(time.Second * 2)
+
+		// 权限设置
+		// 生成serviceacount
+		sa := v1.ServiceAccount{}
+		sa.Name = user.Spec.UserName + Domain + "-sa"
+		sa.Namespace = user.Spec.UserName + Domain
+
+		err3 := r.Create(ctx, &sa)
+		if err3 != nil {
+			logger.Error(err3, "sa false")
+		}
+		// 创建rolebind  START
+
+		// //判断用户role
+		if user.Spec.Role == "admin" {
+			rolename = "userapp-admin-role"
+		} else {
+			rolename = "userapp-user-role"
+		}
+
+		bind := rbacv1.RoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      user.Spec.UserName + Domain + "-RB",
+				Namespace: userNamespace,
+			},
+			RoleRef: rbacv1.RoleRef{
+				Name:     rolename,
+				Kind:     "ClusterRole",
+				APIGroup: "rbac.authorization.k8s.io",
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Kind:      "ServiceAccount",
+					Name:      user.Spec.UserName + Domain + "-sa",
+					Namespace: userNamespace,
+				},
+			},
+		}
+		err4 := r.Create(ctx, &bind)
+		if err4 != nil {
+			logger.Error(err4, "rbac false")
+		}
+		// 创建rolebind  END
+
 		// 加密密码并生成secret
 		md5_data := util.MD5(user.Spec.Password)
 
 		secret2 := v1.Secret{}
-		var secretName = user.Spec.UserName + domain + "-secret"
+		var secretName = user.Spec.UserName + Domain + "-secret"
 		secret2.ObjectMeta.Name = secretName
-		secret2.ObjectMeta.Namespace = req.Namespace
-		bb := true
-		secret2.ObjectMeta.OwnerReferences = append(secret2.ObjectMeta.OwnerReferences, metav1.OwnerReference{
-			APIVersion:         user.APIVersion,
-			Kind:               user.Kind,
-			Name:               user.Name,
-			UID:                user.UID,
-			BlockOwnerDeletion: &bb,
-		},
-		)
+		secret2.ObjectMeta.Namespace = userNamespace
 		secret2.Data = map[string][]byte{"md5": []byte(md5_data)}
-		r.Create(ctx, &secret2)
+		err5 := r.Create(ctx, &secret2)
+		if err5 != nil {
+			logger.Error(err4, "secret false")
+		}
 
 		// updata user
 		r.UpdataAnnotation(&user)
