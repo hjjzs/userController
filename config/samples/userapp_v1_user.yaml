@@ -1,9 +1,7 @@
 apiVersion: userapp.hjjzs.xyz/v1
 kind: User
 metadata:
-  name: user-sample
+  name: hjjzs
 spec:
-  # TODO(user): Add fields here
-  username: user001
   password: "123456"
   role: admin

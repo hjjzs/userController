@@ -28,9 +28,6 @@ type UserSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// UserNmae
-	//+kubebuilder:validation:Required
-	UserName string `json:"username"`
 
 	// password
 	//+kubebuilder:validation:Required
@@ -55,7 +52,8 @@ type UserStatus struct {
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
 //+kubebuilder:printcolumn:JSONPath=".status.status",type=string,description="user status",name="STATUS"
-//+kubebuilder:resource:path=users,scope=Namespaced,shortName="us",singular=user
+//+kubebuilder:printcolumn:JSONPath=".spec.role",type=string,description="user role",name="ROLE"
+//+kubebuilder:resource:path=users,scope=Cluster,shortName="us",singular=user
 
 // User is the Schema for the users API
 type User struct {

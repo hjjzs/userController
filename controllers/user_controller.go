@@ -45,6 +45,7 @@ var (
 	rolename      string
 	Domain        = "-demo"
 	userNamespace string
+	UserName      string
 )
 
 //+kubebuilder:rbac:groups=userapp.hjjzs.xyz,resources=users,verbs=get;list;watch;create;update;patch;delete
@@ -74,10 +75,11 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		logger.Info("删除成功")
 		return ctrl.Result{}, nil
 	}
+	UserName = user.Name
 	if user.Status.Status == "" {
 		// 创建ns, 如果ns不存在
 		ns := v1.Namespace{}
-		userNamespace = user.Spec.UserName + Domain
+		userNamespace = UserName + Domain
 		err2 := r.Get(ctx, types.NamespacedName{Name: userNamespace}, &ns)
 		if err2 == nil {
 			logger.Info("namespece: " + userNamespace + "已经存在")
@@ -94,8 +96,8 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		// 权限设置
 		// 生成serviceacount
 		sa := v1.ServiceAccount{}
-		sa.Name = user.Spec.UserName + Domain + "-sa"
-		sa.Namespace = user.Spec.UserName + Domain
+		sa.Name = UserName + Domain + "-sa"
+		sa.Namespace = UserName + Domain
 
 		err3 := r.Create(ctx, &sa)
 		if err3 != nil {
@@ -106,31 +108,51 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		// //判断用户role
 		if user.Spec.Role == "admin" {
 			rolename = "userapp-admin-role"
+			bind := rbacv1.ClusterRoleBinding{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: UserName + Domain + "-RB",
+				},
+				RoleRef: rbacv1.RoleRef{
+					Name: rolename,
+					Kind: "ClusterRole",
+					APIGroup: "rbac.authorization.k8s.io",
+				},
+				Subjects: []rbacv1.Subject{
+					{
+						Kind:      "ServiceAccount",
+						Name:      UserName + Domain + "-sa",
+						Namespace: userNamespace,
+					},
+				},
+			}
+			err4 := r.Create(ctx, &bind)
+			if err4 != nil {
+				logger.Error(err4, "rbac false")
+			}
 		} else {
 			rolename = "userapp-user-role"
-		}
-
-		bind := rbacv1.RoleBinding{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      user.Spec.UserName + Domain + "-RB",
-				Namespace: userNamespace,
-			},
-			RoleRef: rbacv1.RoleRef{
-				Name:     rolename,
-				Kind:     "ClusterRole",
-				APIGroup: "rbac.authorization.k8s.io",
-			},
-			Subjects: []rbacv1.Subject{
-				{
-					Kind:      "ServiceAccount",
-					Name:      user.Spec.UserName + Domain + "-sa",
+			bind := rbacv1.RoleBinding{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      UserName + Domain + "-RB",
 					Namespace: userNamespace,
 				},
-			},
-		}
-		err4 := r.Create(ctx, &bind)
-		if err4 != nil {
-			logger.Error(err4, "rbac false")
+				RoleRef: rbacv1.RoleRef{
+					Name:     rolename,
+					Kind:     "ClusterRole",
+					APIGroup: "rbac.authorization.k8s.io",
+				},
+				Subjects: []rbacv1.Subject{
+					{
+						Kind:      "ServiceAccount",
+						Name:      UserName + Domain + "-sa",
+						Namespace: userNamespace,
+					},
+				},
+			}
+			err4 := r.Create(ctx, &bind)
+			if err4 != nil {
+				logger.Error(err4, "rbac false")
+			}
 		}
 		// 创建rolebind  END
 
@@ -138,13 +160,13 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		md5_data := util.MD5(user.Spec.Password)
 
 		secret2 := v1.Secret{}
-		var secretName = user.Spec.UserName + Domain + "-secret"
+		var secretName = UserName + Domain + "-secret"
 		secret2.ObjectMeta.Name = secretName
 		secret2.ObjectMeta.Namespace = userNamespace
 		secret2.Data = map[string][]byte{"md5": []byte(md5_data)}
 		err5 := r.Create(ctx, &secret2)
 		if err5 != nil {
-			logger.Error(err4, "secret false")
+			logger.Error(err5, "secret false")
 		}
 
 		// updata user

@@ -26,19 +26,29 @@ func (rl *UserFilter) Delete(e event.DeleteEvent) bool {
 	u, ok1 := e.Object.(*userappv1.User)
 	if ok1 {
 		//  删除rolebinding
-		rb := rbacv1.RoleBinding{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      u.Spec.UserName + Domain + "-RB",
-				Namespace: u.Spec.UserName + Domain,
-			},
+		if u.Spec.Role == "admin" {
+			rb := rbacv1.ClusterRoleBinding{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: u.Name + Domain + "-RB",
+				},
+			}
+			rl.r.Delete(context.TODO(), &rb)
+
+		}else {
+			rb := rbacv1.RoleBinding{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      u.Name + Domain + "-RB",
+					Namespace: u.Name + Domain,
+				},
+			}
+			rl.r.Delete(context.TODO(), &rb)
 		}
-		rl.r.Delete(context.TODO(), &rb)
 
 		// 删除 serviceaccount
 		sa := v1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: u.Spec.UserName + Domain + "-sa",
-				Namespace: u.Spec.UserName + Domain,
+				Name: u.Name + Domain + "-sa",
+				Namespace: u.Name + Domain,
 			},
 		}
 		rl.r.Delete(context.TODO(), &sa)
@@ -47,7 +57,7 @@ func (rl *UserFilter) Delete(e event.DeleteEvent) bool {
 		se := v1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: u.Status.Secret,
-				Namespace: u.Spec.UserName + Domain,
+				Namespace: u.Name + Domain,
 			},
 		}
 		rl.r.Delete(context.TODO(), &se)
@@ -62,11 +72,11 @@ func (rl *UserFilter) Update(e event.UpdateEvent) bool {
 	ci2, ok2 := e.ObjectNew.(*userappv1.User)
 	if ok1 && ok2 {
 		//
-		if ci.Spec.UserName != ci2.Spec.UserName {
-			// fmt.Println("禁止修改")
-			ci2.Spec.UserName = ci.Spec.UserName
-			rl.r.Update(context.TODO(), ci2)
-		}
+		// if ci.Spec.UserName != ci2.Spec.UserName {
+		// 	// fmt.Println("禁止修改")
+		// 	ci2.Spec.UserName = ci.Spec.UserName
+		// 	rl.r.Update(context.TODO(), ci2)
+		// }
 		if ci.Spec.Role != ci2.Spec.Role {
 			// fmt.Println("禁止修改")
 			ci2.Spec.Role = ci.Spec.Role
