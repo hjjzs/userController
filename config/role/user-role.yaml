@@ -5,8 +5,24 @@ metadata:
   name: userapp-user-role
 rules:
 - apiGroups:
+  - kubevirt.io
+  resources:
+  - virtualmachineinstances
+  verbs:
+  - '*'
+- apiGroups:
   - sub.userapp.hjjzs.xyz
   resources:
   - users/changepass
   verbs:
   - '*'
+- apiGroups:
+  - subresources.kubevirt.io
+  resources:
+  - virtualmachineinstances/console
+  - virtualmachineinstances/vnc
+  verbs:
+  - '*'
+
+
+
