@@ -156,6 +156,31 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		}
 		// 创建rolebind  END
 
+		// 创建rolebind 让用户可以跨ns拿镜像
+
+		bind := rbacv1.RoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "allow-clone-to-user",
+				Namespace: userNamespace,
+			},
+			RoleRef: rbacv1.RoleRef{
+				Name: "datavolume-cloner",
+				Kind: "ClusterRole",
+				APIGroup: "rbac.authorization.k8s.io",
+			},
+			Subjects: []rbacv1.Subject{
+				{
+					Name: "default",
+					Namespace: userNamespace,
+					Kind: "ServiceAccount",
+				},
+			},
+		}
+		err4 := r.Create(ctx, &bind)
+		if err4 != nil {
+			logger.Error(err4, "image rbac false")
+		}
+
 		// 加密密码并生成secret
 		md5_data := util.MD5(user.Spec.Password)
 

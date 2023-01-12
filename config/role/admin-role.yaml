@@ -35,3 +35,18 @@ rules:
   - users
   verbs:
   - '*'
+
+- apiGroups:
+  - imgapp.hjjzs.xyz
+  resources:
+  - containerimages
+  - pvcimages
+  verbs:
+  - '*'
+
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - '*'

@@ -10,19 +10,32 @@ rules:
   - virtualmachineinstances
   verbs:
   - '*'
+
 - apiGroups:
   - sub.userapp.hjjzs.xyz
   resources:
   - users/changepass
   verbs:
   - '*'
+
 - apiGroups:
   - subresources.kubevirt.io
   resources:
   - virtualmachineinstances/console
   - virtualmachineinstances/vnc
+  - virtualmachines/addvolume
+  - virtualmachines/removevolume
+  - virtualmachines/migrate
   verbs:
   - '*'
+  
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  verbs:
+  - '*'
+
 
 
 
