@@ -160,8 +160,8 @@ func (r *UserReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 
 		bind := rbacv1.RoleBinding{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "allow-clone-to-user",
-				Namespace: userNamespace,
+				Name: "allow-clone-to" + UserName,
+				Namespace: "default",
 			},
 			RoleRef: rbacv1.RoleRef{
 				Name: "datavolume-cloner",

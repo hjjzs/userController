@@ -13,12 +13,13 @@ rules:
   - users
   verbs:
   - '*'
-
+# vm
 - apiGroups:
   - subresources.kubevirt.io
   resources:
   - virtualmachineinstances/console
   - virtualmachineinstances/vnc
+  - virtualmachines/migrate
   verbs:
   - '*'
 
@@ -26,16 +27,17 @@ rules:
   - kubevirt.io
   resources:
   - virtualmachineinstances
+  - virtualmachines
   verbs:
   - '*'
-
+# user
 - apiGroups:
   - userapp.hjjzs.xyz
   resources:
   - users
   verbs:
   - '*'
-
+# disk
 - apiGroups:
   - imgapp.hjjzs.xyz
   resources:
@@ -50,3 +52,19 @@ rules:
   - persistentvolumeclaims
   verbs:
   - '*'
+
+# network
+- apiGroups:
+  - "k8s.cni.cncf.io"
+  resources:
+  - network-attachment-definitions
+  verbs:
+  - '*'
+- apiGroups:
+  - "kubeovn.io"
+  resources:
+  - subnets
+  verbs:
+  - '*'
+
+

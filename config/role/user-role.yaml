@@ -8,6 +8,7 @@ rules:
   - kubevirt.io
   resources:
   - virtualmachineinstances
+  - virtualmachines
   verbs:
   - '*'
 
@@ -36,6 +37,18 @@ rules:
   verbs:
   - '*'
 
+- apiGroups:
+  - "k8s.cni.cncf.io"
+  resources:
+  - network-attachment-definitions
+  verbs:
+  - '*'
+- apiGroups:
+  - "kubeovn.io"
+  resources:
+  - subnets
+  verbs:
+  - '*'
 
 
 
