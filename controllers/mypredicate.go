@@ -43,7 +43,16 @@ func (rl *UserFilter) Delete(e event.DeleteEvent) bool {
 			}
 			rl.r.Delete(context.TODO(), &rb)
 		}
+		// 删除用于获取镜像的rolebing
 
+		rb2 := rbacv1.RoleBinding{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "allow-clone-to" + UserName,
+				Namespace: "default",
+			},
+		}
+		rl.r.Delete(context.TODO(), &rb2)
+		
 		// 删除 serviceaccount
 		sa := v1.ServiceAccount{
 			ObjectMeta: metav1.ObjectMeta{

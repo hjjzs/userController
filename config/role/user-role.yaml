@@ -27,6 +27,10 @@ rules:
   - virtualmachines/addvolume
   - virtualmachines/removevolume
   - virtualmachines/migrate
+  - virtualmachines/start
+  - virtualmachines/stop
+  - virtualmachines/restart
+
   verbs:
   - '*'
   
